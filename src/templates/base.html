@@ -10,27 +10,21 @@
   <link rel="icon" type="image/png" href="{{ url_for("static", filename="assets/dino.png") }}">
   <title>Flask Demo</title>
 </head>
-
-
 <body>
   <header>
-    <nav>
+    <nav class="main_nav">
       <ul>
-        <li><a href="/">Home</a></li>
-        <li><a href="/stock">Stock</a></li>
+        <li><a href="{{ url_for(".home") }}">Home</a></li>
+        <li><a href="{{ url_for(".company_search") }}">Search</a></li>
+        <li><a href="{{ url_for(".portfolio_detail") }}">Portfolio</a></li>
       </ul>
     </nav>
   </header>
   <main>
-
-
-    <h1>Welcome to your future!</h1>
-    <p>Some fancy description about the site's features</p>
-
-
+    {% block content %}
+    <h3>No Content</h3>
+    {% endblock content%}
   </main>
-
-  <footer>
-  </footer>
+  <footer></footer>
 </body>
 </html>
