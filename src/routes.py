@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, abort
+from flask import render_template, redirect, url_for, abort, request
 from .forms import CompanySearchForm
 from .models import Company, db
 import requests as req
@@ -20,7 +20,8 @@ def company_search():
 
     # check 1. whehter the method is post and 2.whether data is valid
     # so that we don't need if request.method == POST:
-    if form.validate_on_submit():
+    # if form.validate_on_submit():
+    if request.method == 'POST':
         # everything here are about POST
 
         res = req.get(f'https://api.iextrading.com/1.0/stock/{ form.data["symbol"] }/company')

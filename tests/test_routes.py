@@ -49,7 +49,7 @@ def test_search_route_get():
 def test_search_porst_pre_redirect(client):
     rv = client.post('/search', data = {'symbol':'sq'}, follow_redirects = False)
     # hum...somehow I'm getting 200 on this...even with follow_redirects = False
-    assert rv.status_code == 200
+    assert rv.status_code == 302
 
 def test_search_post(client):
     rv = client.post('/search', data = {'symbol':'sq'}, follow_redirects = True)
@@ -57,4 +57,6 @@ def test_search_post(client):
 
 def test_bunk_symbols(client):
     rv = client.post('/search', data = {'symbol':''}, follow_redirects = True)
-    assert rv.status_code == 200 #somehow...this is not 404...
+    assert rv.status_code == 404 #somehow...this is not 404...
+
+#hum...weird, somehow the routes call client part are not executed.
