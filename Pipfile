@@ -12,6 +12,8 @@ flask-wtf = "*"
 flask-sqlalchemy = "*"
 flask-migrate = "*"
 psycopg2 = "*"
+pytest = "*"
+coverage = "*"
 
 [requires]
 python_version = "3.6"
