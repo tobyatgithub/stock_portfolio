@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+  <p>Name: {{ _____.name }}</p>
+  <p>Symbol: {{ _____.symbol }}</p>
+
+  <form action="{{ url_for(".preview_stock") }}" method="POST">
+    {{ form.hidden_tag() }}
+    <div class="hidden" hidden>
+      {{ form.symbol.label }}{{ form.symbol(size=20) }}
+      {{ form.name.label }}{{ form.name(size=20) }}
+    </div>
+    <input type="submit" value="Go">
+  </form>
+</div>
+{% endblock %}
