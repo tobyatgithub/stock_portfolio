@@ -21,10 +21,19 @@
     </nav>
   </header>
   <main>
+    {% for message in get_flashed_messages() %}
+      <div class="flashed container">{{ message }}</div>
+    {% endfor %}
+
+
+
     {% block content %}
-    <h3>No Content</h3>
+    <h2>No Content</h2>
     {% endblock content%}
   </main>
   <footer></footer>
+  {% block scripts %}
+
+  {% endblock scripts %}
 </body>
 </html>

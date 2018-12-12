@@ -2,7 +2,13 @@
 
 {% block content %}
 <div class="container">
-  <h2>Welcome to the Portfolio</h2>
-  <p>Currently under construction!</p>
+  <h2>Welcome to your Portfolio</h2>
+  {% for company in companies %}
+    <div class="company">
+      <p>Here's your companies!</p>
+      <p>Symbol: {{ company.symbol }}</p>
+      <p>Name: {{ company.name }}</p>
+    </div>
+  {% endfor %}
 </div>
 {% endblock %}

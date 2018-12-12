@@ -6,3 +6,10 @@ class CompanySearchForm(FlaskForm):
     """
     """
     symbol = StringField('symbol', validators = [DataRequired()])
+
+
+class CompanyAddForm(FlaskForm):
+    """
+    """
+    symbol = StringField('symbol', validators=[DataRequired()])
+    name = StringField('name', validators=[DataRequired()])
