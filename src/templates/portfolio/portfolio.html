@@ -14,8 +14,10 @@
   <div>
     {% for portfolio in portfolios %}
       <div class="portfolio">
-        <p>Symbol: {{ portfolio.symbol }}</p>
-        <p>Name: {{ portfolio.name }}</p>
+        {% for company in portfolio.companies %}
+          <p>Symbol: {{ company.symbol }}</p>
+          <p>Name: {{ company.name }}</p>
+        {% endfor %}
       </div>
     {% endfor %}
   </div>

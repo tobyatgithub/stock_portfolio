@@ -68,17 +68,33 @@ def company_search():
 def preview_stock():
     """
     """
+    # session['context'] example:
+    # {'CEO': 'Jeffrey P. Bezos', 'companyName': 'Amazon.com Inc.', 'description':
+    # 'Amazon.com Inc is an online retailer. The Company sells its products through
+    # the website which provides services, such as advertising services and co-branded
+    # credit card agreements. It also offers electronic devices like Kindle e-readers and Fire tablets.',
+    # 'exchange': 'Nasdaq Global Select', 'industry': 'Retail - Apparel & Specialty',
+    # 'issueType': 'cs', 'sector': 'Consumer Cyclical', 'symbol': 'AMZN', 'tags': ['Consumer Cyclical',
+    # 'Specialty Retail', 'Retail - Apparel & Specialty'], 'website': 'http://www.amazon.com'}
+
+
     form_context = {
         'name': session['context']['companyName'],
         'symbol':session['symbol'],
+        'CEO':session['context']['CEO'],
+        # 'description':session['context']['description'],
+        # 'exchange':session['context']['exchange'],
+        # 'industry':session['context']['industry'],
+
     }
     form = CompanyAddForm(**form_context)
-
+    # import pdb; pdb.set_trace()
     if form.validate_on_submit():
         try:
             company = Company(
                 name = form.data['name'],
                 symbol = form.data['symbol'],
+                CEO = form.data['CEO'],
                 portfolio_id = form.data['portfolios'],
             )
             db.session.add(company)

@@ -14,6 +14,7 @@ class CompanyAddForm(FlaskForm):
     """
     symbol = StringField('symbol', validators=[DataRequired()])
     name = StringField('name', validators=[DataRequired()])
+    CEO = StringField('CEO', validators=[DataRequired()])
     portfolios = SelectField('portfolios')
 
     def __init__(self, *args, **kwargs):
