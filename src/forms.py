@@ -25,4 +25,4 @@ class CompanyAddForm(FlaskForm):
 class PortfolioCreateForm(FlaskForm):
     """
     """
-    name = StringField('name', validators=[DataRequired()])
+    name = StringField('Portfolio Name', validators=[DataRequired()])
