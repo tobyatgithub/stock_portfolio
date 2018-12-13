@@ -13,11 +13,11 @@ class Company(db.Model):
     portfolio_id = db.Column(db.ForeignKey('portfolios.id'), nullable=False)
     name = db.Column(db.String(256), index=True)
     symbol = db.Column(db.String(64), index=True)
+    CEO = db.Column(db.String(128))
     # exchange = db.Column(db.String(128))
     # industry = db.Column(db.String(128))
     # website = db.Column(db.String(128))
     # description = db.Column(db.Text)
-    # CEO = db.Column(db.String(128))
     # issueType = db.Column(db.String(128))
     # sector = db.Column(db.String(128))
 

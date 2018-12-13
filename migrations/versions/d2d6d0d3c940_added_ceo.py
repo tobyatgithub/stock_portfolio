@@ -1,8 +1,8 @@
-"""empty message
+"""added ceo
 
-Revision ID: ca67fafe425e
+Revision ID: d2d6d0d3c940
 Revises: 
-Create Date: 2018-12-12 16:56:02.279082
+Create Date: 2018-12-12 17:31:18.144457
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'ca67fafe425e'
+revision = 'd2d6d0d3c940'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,7 @@ def upgrade():
     sa.Column('portfolio_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=256), nullable=True),
     sa.Column('symbol', sa.String(length=64), nullable=True),
+    sa.Column('CEO', sa.String(length=128), nullable=True),
     sa.Column('date_created', sa.DateTime(), nullable=True),
     sa.ForeignKeyConstraint(['portfolio_id'], ['portfolios.id'], ),
     sa.PrimaryKeyConstraint('id')

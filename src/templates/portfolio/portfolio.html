@@ -13,10 +13,22 @@
   </div>
   <div>
     {% for portfolio in portfolios %}
+    <table style="width:60%">
       <div class="portfolio">
-        <p>Symbol: {{ portfolio.symbol }}</p>
-        <p>Name: {{ portfolio.name }}</p>
+        <tr>
+          <th>Company Name</th>
+          <th>Symbol</th>
+          <th>Current CEO</th>
+        </tr>
+        {% for company in portfolio.companies %}
+          <tr>
+            <td> {{ company.name }} </td>
+            <td> {{ company.symbol }} </td>
+            <td> {{ company.CEO }} </td>
+          </tr>
+        {% endfor %}
       </div>
+    </table>
     {% endfor %}
   </div>
 </div>
