@@ -2,8 +2,8 @@
 
 {% block content %}
 <div class="container">
-  <p>Name: {{ _____.name }}</p>
-  <p>Symbol: {{ _____.symbol }}</p>
+  <p>Name: {{ company_data.companyName }}</p>
+  <p>Symbol: {{ symbol }}</p>
 
   <form action="{{ url_for(".preview_stock") }}" method="POST">
     {{ form.hidden_tag() }}
@@ -11,6 +11,7 @@
       {{ form.symbol.label }}{{ form.symbol(size=20) }}
       {{ form.name.label }}{{ form.name(size=20) }}
     </div>
+    {{ form.portfolios.label }}{{ form.portfolios() }}
     <input type="submit" value="Go">
   </form>
 </div>
