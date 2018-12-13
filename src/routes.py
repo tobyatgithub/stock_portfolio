@@ -1,11 +1,17 @@
 from flask import render_template, redirect, url_for, abort, request, flash, session
+from .forms import CompanySearchForm, CompanyAddForm, PortfolioCreateForm
 from sqlalchemy.exc import DBAPIError, IntegrityError
-from .forms import CompanySearchForm, CompanyAddForm
-from .models import Company, db
+from .models import Company, db, Portfolio
 from . import app # we can do this bcz we define all those lines in the __init__.py
 import requests as req
 import json
 import os
+
+@app.add_template_global
+def get_portfolios():
+    """
+    """
+    return Portfolio.query.all()
 
 @app.route('/')
 def home():
@@ -26,7 +32,7 @@ def company_search():
     # if request.method == 'POST':
         # everything here are about POST
         symbol = form.data['symbol']
-        res = req.get(f'https://api.iextrading.com/1.0/stock/{ form.data["symbol"] }/company')
+        res = req.get(f'https://api.iextrading.com/1.0/stock/{form.data["symbol"]}/company')
 
         # try:
         #     data = json.loads(res.text)
@@ -44,11 +50,12 @@ def company_search():
         #     new_company = Company(**company)
             # db.session.add(new_company)
             # db.session.commit()
+        # flash('Ok..we got your request!')
         data = json.loads(res.text)
         session['context'] = data
         session['symbol'] = symbol
 
-        return redirect(url_for('.portfolio_detail'))
+        return redirect(url_for('.preview_stock'))
 
         # except json.JSONDecodeError: # will be when the json.loads got empty
         #     abort(404)
@@ -62,14 +69,18 @@ def preview_stock():
     """
     """
     form_context = {
-        'name': session['context']['name'],
+        'name': session['context']['companyName'],
         'symbol':session['symbol'],
     }
     form = CompanyAddForm(**form_context)
 
     if form.validate_on_submit():
         try:
-            company = Company(name = form.data['name'], symbol = form.data['symbol'])
+            company = Company(
+                name = form.data['name'],
+                symbol = form.data['symbol'],
+                portfolio_id = form.data['portfolios'],
+            )
             db.session.add(company)
             db.session.commit()
         except (DBAPIError, IntegrityError):
@@ -82,12 +93,28 @@ def preview_stock():
         'portfolio/preview.html',
         form=form,
         symbol = form_context['symbol'],
-        stock_data = session['context'],
+        company_data = session['context'],
     )
 
-@app.route('/portfolio')
+@app.route('/portfolio', methods=['GET','POST'])
 def portfolio_detail():
     """
     """
-    companies = Company.query.all()  #somehow this line not really working...
-    return render_template('portfolio/portfolio.html', companies = companies)
+    form = PortfolioCreateForm()
+
+    if form.validate_on_submit():
+        # flash('OK we received form.')
+        try:
+            portfolio = Portfolio(name=form.data['name'])
+            db.session.add(portfolio)
+            db.session.commit()
+        except:
+            flash('Opps, something went bad uhhh.')
+            return render_template('portfolio/portfolio.html', form=form)
+
+        return redirect(url_for('.company_search'))
+
+    companies = Company.query.all()
+    portfolios = Portfolio.query.all()
+    # import pdb; pdb.set_trace()
+    return render_template('portfolio/portfolio.html', companies=companies, portfolios=portfolios,form=form)
