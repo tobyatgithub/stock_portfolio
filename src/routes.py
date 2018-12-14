@@ -1,7 +1,8 @@
-from flask import render_template, redirect, url_for, abort, request, flash, session
+from flask import render_template, redirect, url_for, abort, request, flash, session, g
 from .forms import CompanySearchForm, CompanyAddForm, PortfolioCreateForm
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from .models import Company, db, Portfolio
+from .auth import login_required
 from . import app # we can do this bcz we define all those lines in the __init__.py
 import requests as req
 import json
@@ -20,7 +21,9 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/search', methods = ['GET','POST'])
+@app.route('/search', methods=['GET', 'POST'])
+# protect company_search page:
+@login_required
 def company_search():
     """
     """
@@ -54,17 +57,15 @@ def company_search():
         data = json.loads(res.text)
         session['context'] = data
         session['symbol'] = symbol
-
         return redirect(url_for('.preview_stock'))
-
         # except json.JSONDecodeError: # will be when the json.loads got empty
         #     abort(404)
-
-
     # here we handle GET
-    return render_template('portfolio/search.html', form = form)
+    return render_template('portfolio/search.html', form=form)
 
-@app.route('/preview', methods = ['GET','POST'])
+
+@app.route('/preview', methods=['GET', 'POST'])
+@login_required
 def preview_stock():
     """
     """
@@ -76,12 +77,10 @@ def preview_stock():
     # 'exchange': 'Nasdaq Global Select', 'industry': 'Retail - Apparel & Specialty',
     # 'issueType': 'cs', 'sector': 'Consumer Cyclical', 'symbol': 'AMZN', 'tags': ['Consumer Cyclical',
     # 'Specialty Retail', 'Retail - Apparel & Specialty'], 'website': 'http://www.amazon.com'}
-
-
     form_context = {
         'name': session['context']['companyName'],
-        'symbol':session['symbol'],
-        'CEO':session['context']['CEO'],
+        'symbol': session['symbol'],
+        'CEO': session['context']['CEO'],
         # 'description':session['context']['description'],
         # 'exchange':session['context']['exchange'],
         # 'industry':session['context']['industry'],
@@ -92,10 +91,10 @@ def preview_stock():
     if form.validate_on_submit():
         try:
             company = Company(
-                name = form.data['name'],
-                symbol = form.data['symbol'],
-                CEO = form.data['CEO'],
-                portfolio_id = form.data['portfolios'],
+                name=form.data['name'],
+                symbol=form.data['symbol'],
+                CEO=form.data['CEO'],
+                portfolio_id=form.data['portfolios'],
             )
             db.session.add(company)
             db.session.commit()
@@ -108,11 +107,12 @@ def preview_stock():
     return render_template(
         'portfolio/preview.html',
         form=form,
-        symbol = form_context['symbol'],
-        company_data = session['context'],
+        symbol=form_context['symbol'],
+        company_data=session['context'],
     )
 
-@app.route('/portfolio', methods=['GET','POST'])
+@app.route('/portfolio', methods=['GET', 'POST'])
+@login_required
 def portfolio_detail():
     """
     """
@@ -121,16 +121,25 @@ def portfolio_detail():
     if form.validate_on_submit():
         # flash('OK we received form.')
         try:
-            portfolio = Portfolio(name=form.data['name'])
+            # db.session.clear()
+            portfolio = Portfolio(name=form.data['name'], user_id=g.user.id)
             db.session.add(portfolio)
             db.session.commit()
-        except:
+        except (DBAPIError, IntegrityError):
             flash('Opps, something went bad uhhh.')
             return render_template('portfolio/portfolio.html', form=form)
 
         return redirect(url_for('.company_search'))
 
-    companies = Company.query.all()
-    portfolios = Portfolio.query.all()
+    user_portfolios = Portfolio.query.filter(Portfolio.user_id == g.user.id).all()
+    por_ids = [p.id for p in user_portfolios]
+
+    companies = Company.query.filter(Company.portfolio_id.in_(por_ids)).all()
+    # companies = Company.query.all()
+    # portfolios = Portfolio.query.all()
     # import pdb; pdb.set_trace()
-    return render_template('portfolio/portfolio.html', companies=companies, portfolios=portfolios,form=form)
+    return render_template(
+        'portfolio/portfolio.html',
+        companies=companies,
+        portfolios=user_portfolios,
+        form=form)
