@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class = "container">
+    <h2>Resiger:</h2>
+    <form actin="{{ url_for(".register") }}" method = "POST">
+      {{ form.hidden_tag() }}
+      {{ form.email.label }}{{ form.email(size=48) }}
+      {{ form.password.label }}{{ form.password(size=48) }}
+      <input type="submit" name="register_form" id="register_form" value="Register">
+    </form>
+  </div>
+{% endblock content %}

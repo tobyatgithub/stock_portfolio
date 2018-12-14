@@ -1,12 +1,13 @@
-from wtforms import StringField, SelectField
+from wtforms import StringField, SelectField, PasswordField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
 from .models import Portfolio
 
+
 class CompanySearchForm(FlaskForm):
     """
     """
-    symbol = StringField('symbol', validators = [DataRequired()])
+    symbol = StringField('symbol', validators=[DataRequired()])
 
 
 class CompanyAddForm(FlaskForm):
@@ -25,4 +26,12 @@ class CompanyAddForm(FlaskForm):
 class PortfolioCreateForm(FlaskForm):
     """
     """
-    name = StringField('name', validators=[DataRequired()])
+    name = StringField('Portfolio Name', validators=[DataRequired()])
+
+
+class AuthForm(FlaskForm):
+    """
+    The form for authorization activities such as register and login in.
+    """
+    email = StringField('email', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()])
