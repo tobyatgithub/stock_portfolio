@@ -1,3 +1,4 @@
+from flask import render_template, flash, redirect, url_for, session, g, flash
 from wtforms import StringField, SelectField, PasswordField
 from wtforms.validators import DataRequired
 from flask_wtf import FlaskForm
@@ -20,7 +21,10 @@ class CompanyAddForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.portfolios.choices = [(str(c.id), c.name) for c in Portfolio.query.all()]
+        self.portfolios.choices = [(str(c.id), c.name) for c in
+        Portfolio.query.filter(Portfolio.user_id == g.user.id).all()]
+
+        # self.portfolios.choices = [(str(c.id), c.name) for c in Portfolio.query.all()]
 
 
 class PortfolioCreateForm(FlaskForm):
