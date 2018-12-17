@@ -1,8 +1,8 @@
-"""reini db for user id
+"""modifying test db, need ad values in for tests.
 
-Revision ID: 98f9a7bb2051
+Revision ID: 93c64d5ee1dd
 Revises: 
-Create Date: 2018-12-13 16:35:06.370785
+Create Date: 2018-12-13 18:07:33.176997
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '98f9a7bb2051'
+revision = '93c64d5ee1dd'
 down_revision = None
 branch_labels = None
 depends_on = None

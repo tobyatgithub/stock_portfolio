@@ -62,7 +62,7 @@ def session(db, request):
         connection.close()
         session.remove()
 
-    request.addfinalizer(teardown)
+    # request.addfinalizer(teardown)
     return session
 
 

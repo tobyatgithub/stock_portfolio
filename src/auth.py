@@ -73,6 +73,7 @@ def login():
     """
     """
     form = AuthForm()
+    # import pdb; pdb.set_trace()
 
     if form.validate_on_submit():
         email = form.data['email']
