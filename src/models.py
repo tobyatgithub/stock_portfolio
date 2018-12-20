@@ -62,7 +62,7 @@ class User(db.Model):
 
     def __init__(self, email, password):
         self.email = email
-        self.password = sha256_crypt.encrypt(password) #to encrypt
+        self.password = sha256_crypt.hash(password) #to encrypt
 
     @classmethod
     def check_password_hash(cls, user, password):

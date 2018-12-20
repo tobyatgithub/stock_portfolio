@@ -38,23 +38,7 @@ def company_search():
         symbol = form.data['symbol']
         res = req.get(f'https://api.iextrading.com/1.0/stock/{form.data["symbol"]}/company')
 
-        # try:
-        #     data = json.loads(res.text)
-        #     company = {
-        #         'symbol' : data['symbol'],
-        #         'companyName' : data['companyName'],
-        #         'exchange': data['exchange'],
-        #         'industry': data['industry'],
-        #         'website' : data['website'],
-        #         'description' : data['description'],
-        #         'CEO' : data['CEO'],
-        #         'issueType' : data['issueType'],
-        #         'sector' : data['sector'],
-        #     }
-        #     new_company = Company(**company)
-            # db.session.add(new_company)
-            # db.session.commit()
-        # flash('Ok..we got your request!')
+        flash('Ok..we got your request!')
         data = json.loads(res.text)
         session['context'] = data
         session['symbol'] = symbol
@@ -107,6 +91,7 @@ def preview_stock():
 
     candle_script, candle_div, stock_name = make_candle_chart(form_context['symbol'])
     circle_script, circle_div, stock_name = make_weight_graph(form_context['symbol'])
+
     return render_template(
         'portfolio/preview.html',
         form=form,
@@ -118,6 +103,7 @@ def preview_stock():
         circle_div = circle_div,
         circle_script = circle_script,
     )
+
 
 @app.route('/portfolio', methods=['GET', 'POST'])
 @login_required
