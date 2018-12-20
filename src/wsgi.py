@@ -37,31 +37,31 @@ def chart(stock_name=None):
     sourceInc = bk.ColumnDataSource(df.loc[inc])
     sourceDec = bk.ColumnDataSource(df.loc[dec])
 
-    # hover = HoverTool(
-    #     tooltips=[
-    #     ('Date', '@date'),
-    #     ('Low', '@low'),
-    #     ('High', '@high'),
-    #     ('Open', '@open'),
-    #     ('Close', '@close'),
-    #     ('Percent', '@changePercent'),
-    #     ])
+    hover = HoverTool(
+        tooltips=[
+        ('Date', '@date'),
+        ('Low', '@low'),
+        ('High', '@high'),
+        ('Open', '@open'),
+        ('Close', '@close'),
+        ('Percent', '@changePercent'),
+        ], names = ["rect1","rect2"])
 
-    TOOLS = []
-    # TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
+    # TOOLS = []
+    TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
     p = figure(plot_width = 1000, plot_height = 800, title = stock_name, tools=TOOLS, toolbar_location = 'above')
     p.xaxis.major_label_orientation = np.pi/4
 
     # set gird line width
     p.grid.grid_line_alpha = w
-    descriptor = Label(x=70, y=70, text=f"5-year stock chart of {stock_name}")
-    p.add_layout(descriptor)
+    # descriptor = Label(x=70, y=70, text=f"5-year stock chart of {stock_name}")
+    # p.add_layout(descriptor)
 
     p.segment(df.seqs[inc],df.high[inc], df.seqs[inc], df.low[inc], color = 'green')
     p.segment(df.seqs[dec],df.high[dec], df.seqs[dec], df.low[dec], color = 'red')
 
-    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='red', line_color='red', source=sourceDec)
-    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='green', line_color='green', source=sourceInc)
+    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='red', line_color='red', source=sourceDec, name = "rect1")
+    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='green', line_color='green', source=sourceInc, name = "rect2")
 
     script, div = components(p)
     return render_template("chart.html", stock_name=stock_name, the_div=div, the_script=script)
