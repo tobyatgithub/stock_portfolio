@@ -14,15 +14,20 @@ from bokeh.plotting import figure, output_file #, show
 from bokeh.models import Label, HoverTool, BoxZoomTool, PanTool, ZoomInTool, ZoomOutTool, ResetTool
 from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
 
-@app.route("/<stock_name>/", methods = ['GET']) # TODO: need to change route name
-def chart(stock_name=None):
-    # try:
-    API_URL = 'https://api.iextrading.com/1.0'
-    res = requests.get(f'{ API_URL }/stock/{ stock_name }/chart/5y')
-    data = res.json()
-    # except JSONDecodeError:
-        # abort(404)
-        # data = get_data(stock_name)
+@app.route("/charts/<stock_name>/", methods = ['GET']) # TODO: need to change route name
+def generate_stock_graph_page():
+    pass
+
+def make_candle_chart(stock_name=None):
+    """
+    """
+
+    try:
+        API_URL = 'https://api.iextrading.com/1.0'
+        res = requests.get(f'{ API_URL }/stock/{ stock_name }/chart/5y')
+        data = res.json()
+    except JSONDecodeError:
+        abort(404)
     df = pd.DataFrame(data)
     # df["date"] = pd.to_datetime(df["date"])
     # import pdb; pdb.set_trace()
@@ -37,34 +42,83 @@ def chart(stock_name=None):
     sourceInc = bk.ColumnDataSource(df.loc[inc])
     sourceDec = bk.ColumnDataSource(df.loc[dec])
 
-    # hover = HoverTool(
-    #     tooltips=[
-    #     ('Date', '@date'),
-    #     ('Low', '@low'),
-    #     ('High', '@high'),
-    #     ('Open', '@open'),
-    #     ('Close', '@close'),
-    #     ('Percent', '@changePercent'),
-    #     ])
 
-    TOOLS = []
-    # TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
+    hover = HoverTool(
+        tooltips=[
+        ('Date', '@date'),
+        ('Low', '@low'),
+        ('High', '@high'),
+        ('Open', '@open'),
+        ('Close', '@close'),
+        ('Percent', '@changePercent'),
+        ], names = ["rect1","rect2"])
+
+    TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
     p = figure(plot_width = 1000, plot_height = 800, title = stock_name, tools=TOOLS, toolbar_location = 'above')
     p.xaxis.major_label_orientation = np.pi/4
 
     # set gird line width
     p.grid.grid_line_alpha = w
-    descriptor = Label(x=70, y=70, text=f"5-year stock chart of {stock_name}")
-    p.add_layout(descriptor)
+    # descriptor = Label(x=70, y=70, text=f"5-year stock chart of {stock_name}")
+    # p.add_layout(descriptor)
 
     p.segment(df.seqs[inc],df.high[inc], df.seqs[inc], df.low[inc], color = 'green')
     p.segment(df.seqs[dec],df.high[dec], df.seqs[dec], df.low[dec], color = 'red')
 
-    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='red', line_color='red', source=sourceDec)
-    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='green', line_color='green', source=sourceInc)
+    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='red', line_color='red', source=sourceDec, name = "rect1")
+    p.rect(x='seqs', y='mid', width=w, height='height', fill_color='green', line_color='green', source=sourceInc, name = "rect2")
 
     script, div = components(p)
-    return render_template("chart.html", stock_name=stock_name, the_div=div, the_script=script)
+    return script, div, stock_name
+    # return render_template("chart.html", stock_name=stock_name, the_div=div, the_script=script)
+
+def make_weight_graph(stock_name = None):
+    """
+    """
+    try:
+        API_URL = 'https://api.iextrading.com/1.0'
+        res = requests.get(f'{ API_URL }/stock/{ stock_name }/chart/5y')
+        data = res.json()
+    except JSONDecodeError:
+        abort(404)
+    df = pd.DataFrame(data)
+    # df['date'] = pd.to_datetime(df['date'])
+    df['adjVolume'] = 6*df['volume']//df['volume'].mean()
+    df = df[['date','vwap', 'volume','adjVolume']]
+    seqs = np.arange(df.shape[0])
+    df['seqs'] = pd.Series(seqs)
+
+    source = ColumnDataSource(df)
+    colors = ["#75968f", "#a5bab7", "#c9d9d3", "#e2e2e2", "#dfccce", "#ddb7b1", "#cc7878", "#933b41", "#550b1d"]
+    mapper = LinearColorMapper(palette=colors, low=df.adjVolume.min(), high=df.adjVolume.max())
+
+    hover = HoverTool(
+        tooltips=[
+        ('Date', '@date'),
+        ('Vwap', '@vwap'),
+        ('Volume', '@volume'),
+        ], names = ["circle"])
+
+    TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
+    p = figure(plot_width=1000, plot_height=800, title= f'5 year weighted performace of {stock_name}',
+            tools=TOOLS, toolbar_location = 'above')
+
+    # p.circle(x=new_df["date"], y=new_df["vwap"], source=source, size=new_df['adjVolume'], fill_color=transform('adjVolume', mapper))
+    p.circle(x="seqs", y="vwap", source=source, size='adjVolume', fill_color=transform('adjVolume', mapper), name = "circle")
+    color_bar = ColorBar(color_mapper=mapper, location=(0, 0),
+                        ticker=BasicTicker(desired_num_ticks=len(colors)),
+                        formatter=PrintfTickFormatter(format="%s%%"))
+    p.add_layout(color_bar, 'right')
+
+    p.axis.axis_line_color = None
+    p.axis.major_tick_line_color = None
+    p.axis.major_label_text_font_size = "5pt"
+    p.axis.major_label_standoff = 0
+    p.xaxis.major_label_orientation = 1.0
+
+    script, div = components(p)
+    return script, div, stock_name
+
 
 def get_data(stock_name):
     """

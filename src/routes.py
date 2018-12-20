@@ -3,6 +3,7 @@ from .forms import CompanySearchForm, CompanyAddForm, PortfolioCreateForm
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from .models import Company, db, Portfolio
 from .auth import login_required
+from .wsgi import make_candle_chart, make_weight_graph
 from . import app # we can do this bcz we define all those lines in the __init__.py
 import requests as req
 import json
@@ -37,23 +38,7 @@ def company_search():
         symbol = form.data['symbol']
         res = req.get(f'https://api.iextrading.com/1.0/stock/{form.data["symbol"]}/company')
 
-        # try:
-        #     data = json.loads(res.text)
-        #     company = {
-        #         'symbol' : data['symbol'],
-        #         'companyName' : data['companyName'],
-        #         'exchange': data['exchange'],
-        #         'industry': data['industry'],
-        #         'website' : data['website'],
-        #         'description' : data['description'],
-        #         'CEO' : data['CEO'],
-        #         'issueType' : data['issueType'],
-        #         'sector' : data['sector'],
-        #     }
-        #     new_company = Company(**company)
-            # db.session.add(new_company)
-            # db.session.commit()
-        # flash('Ok..we got your request!')
+        flash('Ok..we got your request!')
         data = json.loads(res.text)
         session['context'] = data
         session['symbol'] = symbol
@@ -104,12 +89,21 @@ def preview_stock():
 
         return redirect(url_for('.portfolio_detail'))
 
+    candle_script, candle_div, stock_name = make_candle_chart(form_context['symbol'])
+    circle_script, circle_div, stock_name = make_weight_graph(form_context['symbol'])
+
     return render_template(
         'portfolio/preview.html',
         form=form,
         symbol=form_context['symbol'],
         company_data=session['context'],
+        stock_name = stock_name,
+        candle_div = candle_script,
+        candle_script = candle_div,
+        circle_div = circle_div,
+        circle_script = circle_script,
     )
+
 
 @app.route('/portfolio', methods=['GET', 'POST'])
 @login_required
