@@ -1,22 +1,42 @@
-class TestClass:
-    """
-    here're the scopes. set up to build db, app, and sessions for each
-    test that runs.
+import pytest
+from flask import g
+from ..src import app
+# from flaskr.db import get_db
 
-    Interesting here is, we can define app, db, sessions in conftest.py,
-    and we don't need to import it here And can just use them, Pytest
-    does the work.
+class AuthActions(object):
+    def __init__(self, client):
+        self._client = client
 
-    This is a common way people do test cases.
+    def login(self, username='test', password='test'):
+        return self._client.post(
+            '/auth/login',
+            data={'username': username, 'password': password}
+        )
+
+    def logout(self):
+        return self._client.get('/auth/logout')
 
 
-    """
+@pytest.fixture
+def client(app):
+    return app.test_client()
 
-    # these two classmethods are not really required here.
-    @classmethod
-    def setup_class(cls):
-        pass
+@pytest.fixture
+def auth(client):
+    return AuthActions(client)
 
-    @classmethod
-    def teardown_class(cls):
-        pass
+
+def test_register(client, app):
+    assert client.get('/login').status_code == 200
+    # response = client.post(
+    #     '/login', data={'username': 'a', 'password': 'a'}
+    # )
+    response = client.post(
+        '/login', data={'username': 'test_user1', 'password': '1234'}
+    )
+    import pdb; pdb.set_trace()
+
+    with app.app_context():
+        assert get_db().execute(
+            "select * from user where username = 'a'",
+        ).fetchone() is not None
