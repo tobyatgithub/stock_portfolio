@@ -1,4 +1,4 @@
-from ..src.models import Company, Portfolio
+from ..src.models import Company, Portfolio, User
 from ..src.models import db as _db
 from ..src import app as _app
 import pytest
@@ -45,15 +45,13 @@ def db(app, request):
 
 @pytest.fixture()
 def session(db, request):
+    """Creates a new database session for testing
     """
-    creates a new database session for testing
-    """
-    # initalize talking between db
     connection = db.engine.connect()
     transaction = connection.begin()
 
-    options = dict(bind = connection, binds = {})
-    session = db.create_scoped_session(option = options)
+    options = dict(bind=connection, binds={})
+    session = db.create_scoped_session(options=options)
 
     db.session = session
 
@@ -62,7 +60,7 @@ def session(db, request):
         connection.close()
         session.remove()
 
-    # request.addfinalizer(teardown)
+    request.addfinalizer(teardown)
     return session
 
 
@@ -85,18 +83,9 @@ def client(app, db, session):
 
 
 @pytest.fixture()
-def authenticated_client(client, user):
-    """
-    """
-    client.post(
-        '/login',
-        data={'email':user.email, 'password':'1234'}, # we hard code password bcz user.password is hashed.
-        follow_redirects=True,
-    )
-    yield client # use yield instead of return, as yield will not change any content. yiled ~= temparaily return
-
-    # and after yield finished, you usually will have some cleaning work afterward
-    client.get('/logout')
+def flask_session(client):
+    with client.session_transaction() as flask_session:
+            yield flask_session
 
 
 @pytest.fixture()
@@ -111,17 +100,39 @@ def user(session):
 
 
 @pytest.fixture()
+def authenticated_client(client, user):
+    """
+    """
+    client.post(
+        '/login',
+        data={'email':user.email, 'password':'1234'}, # we hard code password bcz user.password is hashed.
+        follow_redirects=True,
+    )
+    yield client # use yield instead of return, as yield will not change any content. yiled ~= temparaily return
+
+    # and after yield finished, you usually will have some cleaning work afterward
+    client.get('/logout')
+
+
+
+
+@pytest.fixture()
 def portfolio(session, user):
     """
     """
-    portfolio = Portfolio(name='Default')
+    portfolio = Portfolio(name='Default', user_id=user.id)
 
     session.add(portfolio)
     session.commit()
     return portfolio
 
-# @pytest.fixture()
-# def company(session, portfolio):
-#     """
-#     """
-#     company = Company(name='Apple Inc.', symbol = 'AAPL', portfolio_id=portfolio.id)
+
+@pytest.fixture()
+def company(session, portfolio):
+    """
+    """
+    company = Company(name='Microsoft', symbol='msft', portfolio_id=portfolio.id)
+
+    session.add(company)
+    session.commit()
+    return company
