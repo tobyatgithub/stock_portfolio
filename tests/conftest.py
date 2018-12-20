@@ -66,15 +66,59 @@ def session(db, request):
     return session
 
 
-# @pytest.fixture()
-# def portfolio(session):
-#     """
-#     """
-#     portfolio = Portfolio(name='Default')
+@pytest.fixture()
+def client(app, db, session):
+    """
+    """
+    # we need db and session for the following code to happen
+    # so...even we are not calling db or session in word, but
+    # we do need them to make this work.
+    client = app.test_client()
+    ctx = app.app_context()
 
-#     session.add(portfolio)
-#     session.commit()
-#     return portfolio
+    # you have to have db and session for ctx.push to make current into the environment
+    ctx.push()
+
+    yield client
+
+    ctx.pop()
+
+
+@pytest.fixture()
+def authenticated_client(client, user):
+    """
+    """
+    client.post(
+        '/login',
+        data={'email':user.email, 'password':'1234'}, # we hard code password bcz user.password is hashed.
+        follow_redirects=True,
+    )
+    yield client # use yield instead of return, as yield will not change any content. yiled ~= temparaily return
+
+    # and after yield finished, you usually will have some cleaning work afterward
+    client.get('/logout')
+
+
+@pytest.fixture()
+def user(session):
+    """
+    """
+    user = User(email = 'test_user1', password = '1234')
+
+    session.add(user)
+    session.commit()
+    return user
+
+
+@pytest.fixture()
+def portfolio(session, user):
+    """
+    """
+    portfolio = Portfolio(name='Default')
+
+    session.add(portfolio)
+    session.commit()
+    return portfolio
 
 # @pytest.fixture()
 # def company(session, portfolio):
