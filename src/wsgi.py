@@ -14,9 +14,23 @@ from bokeh.plotting import figure, output_file #, show
 from bokeh.models import Label, HoverTool, BoxZoomTool, PanTool, ZoomInTool, ZoomOutTool, ResetTool
 from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
 
-@app.route("/charts/<stock_name>/", methods = ['GET']) # TODO: need to change route name
-def generate_stock_graph_page():
+@app.route("/charts/<" + stock_name + "/>", methods = ['GET']) # TODO: need to change route name
+def generate_stock_graph_page(stock_name=None):
     pass
+#     candle_script, candle_div, stock_name = make_candle_chart(stock_name)
+#     circle_script, circle_div, stock_name = make_weight_graph(stock_name)
+#     page_url = f'/charts/{ stock_name }.html'
+#     return render_template(
+#         page_url,
+#         form=form,
+#         symbol=form_context['symbol'],
+#         company_data=session['context'],
+#         stock_name = stock_name,
+#         candle_div = candle_script,
+#         candle_script = candle_div,
+#         circle_div = circle_div,
+#         circle_script = circle_script,
+#     )
 
 def make_candle_chart(stock_name=None):
     """
@@ -42,7 +56,6 @@ def make_candle_chart(stock_name=None):
     sourceInc = bk.ColumnDataSource(df.loc[inc])
     sourceDec = bk.ColumnDataSource(df.loc[dec])
 
-
     hover = HoverTool(
         tooltips=[
         ('Date', '@date'),
@@ -56,8 +69,6 @@ def make_candle_chart(stock_name=None):
     TOOLS = [hover, BoxZoomTool(), PanTool(), ZoomInTool(), ZoomOutTool(), ResetTool()]
     p = figure(plot_width = 1000, plot_height = 800, title = stock_name, tools=TOOLS, toolbar_location = 'above')
     p.xaxis.major_label_orientation = np.pi/4
-
-    # set gird line width
     p.grid.grid_line_alpha = w
     # descriptor = Label(x=70, y=70, text=f"5-year stock chart of {stock_name}")
     # p.add_layout(descriptor)
@@ -103,7 +114,6 @@ def make_weight_graph(stock_name = None):
     p = figure(plot_width=1000, plot_height=800, title= f'5 year weighted performace of {stock_name}',
             tools=TOOLS, toolbar_location = 'above')
 
-    # p.circle(x=new_df["date"], y=new_df["vwap"], source=source, size=new_df['adjVolume'], fill_color=transform('adjVolume', mapper))
     p.circle(x="seqs", y="vwap", source=source, size='adjVolume', fill_color=transform('adjVolume', mapper), name = "circle")
     color_bar = ColorBar(color_mapper=mapper, location=(0, 0),
                         ticker=BasicTicker(desired_num_ticks=len(colors)),
@@ -118,19 +128,6 @@ def make_weight_graph(stock_name = None):
 
     script, div = components(p)
     return script, div, stock_name
-
-
-def get_data(stock_name):
-    """
-    """
-    API_URL = 'https://api.iextrading.com/1.0'
-    res = requests.get(f'{ API_URL }/stock/{ stock_name }/chart/5y')
-    data =res.json()
-    # data = json.loads(res.decode('utf-8'))
-    # response = get_profile().data
-    return data
-
-
 
 
 

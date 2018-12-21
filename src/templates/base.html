@@ -21,11 +21,15 @@
 
   <title>Flask Demo</title>
 </head>
+
+
+
 <body>
   <header>
     <nav class="main_nav">
       <ul>
-        <li><a href="{{ url_for(".home") }}">Home</a></li>
+      {% block nav_bar %}
+        <li><a class="active" href="{{ url_for(".home") }}">Home</a></li>
         {% if g.user %}
         <li><a href="{{ url_for(".company_search") }}">Search</a></li>
         <li><a href="{{ url_for(".portfolio_detail") }}">Portfolio</a></li>
@@ -34,12 +38,11 @@
         <li><a href="{{ url_for(".register") }}">Register</a></li>
         <li><a href="{{ url_for(".login") }}">Login</a></li>
         {% endif %}
-
-
+      {% endblock nav_bar %}
       </ul>
     </nav>
     {% if g.user %}
-      <h3>Welcome to the site {{ g.user['email'] }}</h3>
+      <h3>Welcome to the site, {{ g.user['email'] }}</h3>
     {% endif %}
 
 

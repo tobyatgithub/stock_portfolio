@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 
+{% block nav_bar %}
+  <li><a href="{{ url_for(".home") }}">Home</a></li>
+  {% if g.user %}
+  <li><a href="{{ url_for(".company_search") }}">Search</a></li>
+  <li><a class="active" href="{{ url_for(".portfolio_detail") }}">Portfolio</a></li>
+  <li><a href="{{ url_for(".logout") }}">Logout</a></li>
+  {% else %}
+  <li><a href="{{ url_for(".register") }}">Register</a></li>
+  <li><a href="{{ url_for(".login") }}">Login</a></li>
+  {% endif %}
+{% endblock nav_bar %}
+
 {% block content %}
 <div class="container">
   <h2>Welcome to your Portfolio</h2>
@@ -15,16 +27,20 @@
     {% for portfolio in portfolios %}
     <table style="width:60%">
       <div class="portfolio">
+        <h4> Portfolio: {{ portfolio.name}} </h4>
+        <hr>
         <tr>
           <th>Company Name</th>
           <th>Symbol</th>
           <th>Current CEO</th>
+          <th>View Chart</th>
         </tr>
         {% for company in portfolio.companies %}
           <tr>
             <td> {{ company.name }} </td>
             <td> {{ company.symbol.upper() }} </td>
             <td> {{ company.CEO }} </td>
+            <td> <a href="{{ url_for(".company_search") }}" class="button">View Chart</a> </td>
           </tr>
         {% endfor %}
       </div>
