@@ -1,8 +1,27 @@
 {% extends 'base.html' %}
 
+{% block nav_bar %}
+  <li><a class="active" href="{{ url_for(".home") }}">Home</a></li>
+  {% if g.user %}
+  <li><a href="{{ url_for(".company_search") }}">Search</a></li>
+  <li><a href="{{ url_for(".portfolio_detail") }}">Portfolio</a></li>
+  <li><a href="{{ url_for(".logout") }}">Logout</a></li>
+  {% else %}
+  <li><a href="{{ url_for(".register") }}">Register</a></li>
+  <li><a href="{{ url_for(".login") }}">Login</a></li>
+  {% endif %}
+{% endblock nav_bar %}
+
 {% block content %}
 <div class = "container">
   <h1>Welcome to the Stock Portfolio site.</h1>
+  <p>This is a place where you can select stocks as you wish and create your own portfolio</p>
+  <p>Each time you search for a stock, you will see it's preformance for the past 5 years.</p>
+  <p>Make wise choice and happy investing!</p>
+  {% if not g.user %}
+    <h2>** Please <a value="register" href="{{ url_for(".register") }}">Register</a>
+    or <a value="login" href="{{ url_for(".login") }}">login</a>  to continue! **</h2>
+  {% endif %}
 </div>
 {% endblock content%}
 

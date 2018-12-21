@@ -1,5 +1,18 @@
 {% extends "base.html" %}
 
+
+{% block nav_bar %}
+  <li><a href="{{ url_for(".home") }}">Home</a></li>
+  {% if g.user %}
+  <li><a class="active" href="{{ url_for(".company_search") }}">Search</a></li>
+  <li><a href="{{ url_for(".portfolio_detail") }}">Portfolio</a></li>
+  <li><a href="{{ url_for(".logout") }}">Logout</a></li>
+  {% else %}
+  <li><a href="{{ url_for(".register") }}">Register</a></li>
+  <li><a href="{{ url_for(".login") }}">Login</a></li>
+  {% endif %}
+{% endblock nav_bar %}
+
 {% block content %}
   {% if get_portfolios() %}
     <div class="container">
