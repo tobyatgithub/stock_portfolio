@@ -1,17 +1,5 @@
 import os
-import requests
-import json
-import numpy as np
-from math import pi
-import pandas as pd
-import bokeh.plotting as bk
-from bokeh.embed import components
-from bokeh.transform import transform
 from flask import Flask, render_template
-from bokeh.io import output_notebook, show
-from bokeh.plotting import figure, output_file #, show
-from bokeh.models import Label, HoverTool, BoxZoomTool, PanTool, ZoomInTool, ZoomOutTool, ResetTool
-from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
 
 # get root of the project. The benefit is path is not hard coded and shall be adaptable.
 basedir = os.path.abspath(os.path.dirname(__file__))

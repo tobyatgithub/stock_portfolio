@@ -14,7 +14,8 @@ from bokeh.plotting import figure, output_file #, show
 from bokeh.models import Label, HoverTool, BoxZoomTool, PanTool, ZoomInTool, ZoomOutTool, ResetTool
 from bokeh.models import BasicTicker, ColorBar, ColumnDataSource, LinearColorMapper, PrintfTickFormatter
 
-@app.route("/charts/<" + stock_name + "/>", methods = ['GET']) # TODO: need to change route name
+@app.route("/charts/<stock_name>", methods = ['GET'])
+# @app.route("/charts/<" + stock_name + "/>", methods = ['GET']) # TODO: need to change route name
 def generate_stock_graph_page(stock_name=None):
     pass
 #     candle_script, candle_div, stock_name = make_candle_chart(stock_name)
